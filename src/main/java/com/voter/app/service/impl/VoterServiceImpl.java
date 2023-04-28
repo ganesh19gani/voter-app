@@ -14,6 +14,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -385,7 +387,7 @@ public class VoterServiceImpl implements VoterService {
                     return response;
 
             }
-            List<Voter> listOfVoters = voterRepository.findAll();
+            List<Map<String, Object>> listOfVoters = voterRepository.findAllFromVoter();
             HashMap<String, Object> response = new HashMap<>();
             if (!listOfVoters.isEmpty()) {
                 response.put("status", true);
@@ -398,5 +400,61 @@ public class VoterServiceImpl implements VoterService {
             response.put("result", Collections.emptyList());
             return response;
         }
+    @Autowired
+    private JavaMailSender javaMailSender;
+    @Override
+    public void importAgentsData(MultipartFile file) throws IOException {
+        InputStream inputStream = file.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
 
+        Sheet sheet = workbook.getSheetAt(0);
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) {
+                continue;
+            }
+            AppUsers data = new AppUsers();
+            data.setUserName(row.getCell(0).getStringCellValue());
+            data.setUserRole(row.getCell(1).getStringCellValue());
+           // System.out.println("Email" +row.getCell(1).getStringCellValue() );
+            data.setEmail(row.getCell(2).getStringCellValue());
+            data.setConstituency(row.getCell(3).getStringCellValue());
+            String voterBoothNumber = String.valueOf(row.getCell(4).getNumericCellValue()).substring(0, String.valueOf(row.getCell(4).getNumericCellValue()).length() - 2);
+            data.setUserBoothNumber(voterBoothNumber);
+            data.setUserBoothName(row.getCell(5).getStringCellValue());
+
+            String phoneNumber = String.valueOf(row.getCell(6).getNumericCellValue()).substring(0, String.valueOf(row.getCell(6).getNumericCellValue()).length() - 2);
+            data.setUserPhoneNumber(phoneNumber);
+
+            int getRandomNumber = getRandom();
+            String generatedPassword = row.getCell(0).getStringCellValue().charAt(0)+String.valueOf(getRandomNumber);
+
+            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            simpleMailMessage.setFrom("adapaganeshofficial@gmail.com");
+            simpleMailMessage.setTo(row.getCell(2).getStringCellValue());
+            simpleMailMessage.setText("Agent please find your password for login inside Voter app : \n"+"UserName : "+row.getCell(2).getStringCellValue()+"\n"+"Password : "+generatedPassword);
+            simpleMailMessage.setSubject("Agent Created - Credentials");
+            javaMailSender.send(simpleMailMessage);
+
+            String salt = BCrypt.gensalt();
+            String hashedPassword = BCrypt.hashpw(generatedPassword, salt);
+
+            data.setUserPassword(hashedPassword);
+            data.setUserAffiliatedParty(row.getCell(7).getStringCellValue());
+
+
+             appUserRepository.save(data);
+        }
+        workbook.close();
+        inputStream.close();
+    }
+
+public int getRandom(){
+    Random rand = new Random();
+    int randomNum =0;
+    for (int i = 0; i < 10; i++) {
+        randomNum  = rand.nextInt(900) + 100; // generates a random integer between 100 and 999
+        // System.out.println(randomNum);
+    }
+    return randomNum;
+}
 }

@@ -47,4 +47,6 @@ public interface VoterService {
     Map<String, Object> getAllConstituencies();
 
     Map<String, Object> getAllVotersByFilter(String constituency, String boothName,String statusOfVoter);
+
+    void importAgentsData(MultipartFile file) throws IOException;
 }

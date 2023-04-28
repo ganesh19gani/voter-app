@@ -108,10 +108,20 @@ public class VoterController {
                                                     @RequestParam("statusOfVoter") String statusOfVoter) {
         return voterService.getAllVotersByFilter(constituency, boothName, statusOfVoter);
     }
-    @PostMapping("/import")
+    @PostMapping("/importVoters")
     public ResponseEntity<String> importData(@RequestParam("file") MultipartFile file) {
         try {
             voterService.importData(file);
+            return new ResponseEntity<>("Data imported successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to import data: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/importAgents")
+    public ResponseEntity<String> importAgentsData(@RequestParam("file") MultipartFile file) {
+        try {
+            voterService.importAgentsData(file);
             return new ResponseEntity<>("Data imported successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to import data: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -31,4 +31,7 @@ public interface VoterRepository extends JpaRepository<Voter, Long> {
 
     @Query(value = "select * from voter_list where constituency =?1 and voter_booth_name=?2 and actual!=\"\";",nativeQuery = true )
     List<Map<String, Object>> findByConstituencyAndBoothNameAndVoted(String constituency, String boothName);
+
+    @Query(value = "select * from Voter_list;",nativeQuery = true)
+    List<Map<String, Object>> findAllFromVoter();
 }

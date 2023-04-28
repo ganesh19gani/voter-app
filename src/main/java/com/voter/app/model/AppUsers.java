@@ -33,12 +33,17 @@ public class AppUsers {
     @Column(unique = true)
     private String email;
 
+    @NotEmpty(message = "Constituency should not be Empty")
+    @NotNull(message = "Constituency Should not be null")
+    private String constituency;
 
     private String userBoothNumber;
 
     @NotEmpty(message = "User Booth Name should not be Empty")
     @NotNull(message = "User Booth Name Should not be null")
     private String userBoothName;
+
+
 
     private String userPhoneNumber;
 

@@ -3,11 +3,9 @@ package com.voter.app.service;
 import com.voter.app.model.AppUsers;
 import com.voter.app.model.Parties;
 import com.voter.app.model.Voter;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public interface VoterService {
@@ -49,4 +47,5 @@ public interface VoterService {
     Map<String, Object> getAllVotersByFilter(String constituency, String boothName,String statusOfVoter);
 
     void importAgentsData(MultipartFile file) throws IOException;
+
 }

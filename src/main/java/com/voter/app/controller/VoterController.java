@@ -1,9 +1,6 @@
 package com.voter.app.controller;
 
-import com.voter.app.model.AppUsers;
-import com.voter.app.model.LoginRequest;
-import com.voter.app.model.Parties;
-import com.voter.app.model.Voter;
+import com.voter.app.model.*;
 import com.voter.app.service.VoterService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +19,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/voter")
 @Api(value = "Voter Management System", description = "Operations pertaining to user in Voter Management System")
-@Validated
 public class VoterController {
 
     @Autowired
     private VoterService voterService;
 
     @PostMapping("/register")
-    public Map<String, String> createUser( @RequestBody @Valid AppUsers users) {
+    public Map<String, String> createUser(@RequestBody AppUsers users) {
         return voterService.createUser(users);
     }
 
@@ -127,5 +123,6 @@ public class VoterController {
             return new ResponseEntity<>("Failed to import data: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }
